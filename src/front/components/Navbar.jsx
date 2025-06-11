@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Navbar = () => {
 
@@ -17,3 +18,12 @@ export const Navbar = () => {
 		</nav>
 	);
 };
+
+// const logout = () => {
+// sessionStorage.removeItem('token')};
+// store.message = null;
+// store.token = null;
+// store.isLoginSuccesful - false;
+//}
+
+// the button of LOG OUT (blue - or green, once logged in, changes to red or pink to LOG OUT automatically in dispatch on Store to fetc)
