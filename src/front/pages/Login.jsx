@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer.jsx';
-import { loginUser } from './fetch.js'; // <-- IMPORT from fetch.js
+import { loginUser, setStoredToken, isAuthenticated } from './fetch.js'; // <-- IMPORT from fetch.js
 
 export const Login = () => {
   const { store, dispatch } = useGlobalReducer();
@@ -14,7 +14,7 @@ export const Login = () => {
 
   // This effect correctly redirects if the user is already logged in.
   useEffect(() => {
-    if (store.token) {
+    if (store.token || isAuthenticated()) {
       navigate('/private');
     }
   }, [store.token, navigate]);
@@ -28,17 +28,26 @@ export const Login = () => {
       // 1. Call the clean, centralized function from fetch.js
       const data = await loginUser(email, password);
       
-      // 2. Dispatch the success action to the reducer
+      // 2. Store the token in localStorage using our utility function
+      if (data.access_token) {
+        setStoredToken(data.access_token);
+      }
+      
+      // 3. Dispatch the success action to the reducer
+      // Note: Your backend returns 'access_token', not 'token'
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: { token: data.token, user: data.user },
+        payload: { 
+          token: data.access_token, 
+          user: data.user || { email } // Fallback if user data not returned
+        },
       });
       
-      // 3. Navigate to the private dashboard
+      // 4. Navigate to the private dashboard
       navigate('/private');
 
     } catch (err) {
-      // 4. On failure, set the local error state to display it
+      // 5. On failure, set the local error state to display it
       setError(err.message);
       // Optionally, you can also dispatch to a global error state if needed
       // dispatch({ type: 'SET_ERROR', payload: err.message });

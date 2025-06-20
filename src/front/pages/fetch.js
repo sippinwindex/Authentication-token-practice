@@ -58,6 +58,7 @@ export const getInvoice = (token, invoiceId) => {
         headers: { 'Authorization': `Bearer ${token}` }
     });
 };
+
 // =================================================================
 
 // This function is correct. It generates the invoice number on the frontend.
@@ -92,4 +93,27 @@ export const deleteInvoice = (token, invoiceId) => {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
     });
+};
+
+// Optional: Add these utility functions for better token management
+export const isAuthenticated = () => {
+    const token = localStorage.getItem('token');
+    return !!token;
+};
+
+export const getStoredToken = () => {
+    return localStorage.getItem('token');
+};
+
+export const setStoredToken = (token) => {
+    localStorage.setItem('token', token);
+};
+
+export const removeStoredToken = () => {
+    localStorage.removeItem('token');
+};
+
+export const logoutUser = () => {
+    removeStoredToken();
+    return Promise.resolve({ message: 'Logged out successfully' });
 };

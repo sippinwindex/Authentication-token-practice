@@ -1,7 +1,4 @@
-# src/app.py
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
+# src/app.py - UPDATED with proper JWT configuration
 import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
@@ -15,37 +12,56 @@ from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
 from datetime import timedelta
 
-# We are bypassing dotenv for this test to ensure consistency
-# from dotenv import load_dotenv
-# load_dotenv()
-
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
-# Configure CORS - This is correct for your frontend URL
-CORS(app, resources={r"/api/*": {"origins": ["https://refactored-meme-wr5j9qggjwgjh5vqp-3000.app.github.dev"]}})
+# Configure CORS properly
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["*"],  # Be more restrictive in production
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 
-# =================================================================
-#               THE DEFINITIVE HARDCODED SECRET KEY FIX
-# =================================================================
-# This removes all doubt about environment variables. The same key is now
-# guaranteed to be used for creating and verifying tokens.
-THE_SECRET_KEY = "a_very_strong_and_consistent_secret_key_that_is_not_from_a_file"
+# PROPER JWT CONFIGURATION
+# Get secrets from environment variables (check both possible names)
+jwt_secret = os.getenv('JWT_SECRET_KEY') or os.getenv('JWT_SECRET')
+flask_secret = os.getenv('SECRET_KEY')
 
-# We use the same hardcoded key for both Flask's session and JWT.
-app.config['SECRET_KEY'] = THE_SECRET_KEY
-app.config['JWT_SECRET_KEY'] = THE_SECRET_KEY
-# =================================================================
+# Provide fallbacks for development
+if not jwt_secret:
+    jwt_secret = "fallback-jwt-secret-key-for-development-only"
+    print("⚠️  WARNING: Using fallback JWT secret. Set JWT_SECRET_KEY in .env file!")
 
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+if not flask_secret:
+    flask_secret = "fallback-flask-secret-key-for-development-only"
+    print("⚠️  WARNING: Using fallback Flask secret. Set SECRET_KEY in .env file!")
+
+app.config['SECRET_KEY'] = flask_secret
+app.config['JWT_SECRET_KEY'] = jwt_secret
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)  # Extended for development
 
 # Initialize JWT
 jwt = JWTManager(app)
 
-# --- Database configuration (no changes needed) ---
+# JWT Error Handlers - This is crucial for debugging
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({"message": "Token has expired"}), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({"message": "Invalid token"}), 422
+
+@jwt.unauthorized_loader
+def unauthorized_callback(error):
+    return jsonify({"message": "Authorization required"}), 401
+
+# Database configuration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://")
@@ -56,19 +72,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
-# --- Test User Creation (no changes needed) ---
-if ENV == "development":
-    with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(email="test@example.com").first():
-            from werkzeug.security import generate_password_hash
-            hashed_password = generate_password_hash("testpassword")
-            test_user = User(email="test@example.com", password=hashed_password, is_active=True)
-            db.session.add(test_user)
-            db.session.commit()
-            print("Test user created (test@example.com / testpassword).")
-
-# --- App Setup (no changes needed) ---
+# Setup components
 setup_admin(app)
 setup_commands(app)
 app.register_blueprint(api, url_prefix='/api')
@@ -77,7 +81,6 @@ app.register_blueprint(api, url_prefix='/api')
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-# --- Static File Serving (no changes needed) ---
 @app.route('/')
 def sitemap():
     if ENV == "development":
