@@ -1,78 +1,75 @@
+// src/front/store.js
 export const initialStore = {
-    message: null,
-    // ### NOTE ###: This logic to rehydrate state from localStorage is correct.
-    token: localStorage.getItem("token") || null,
-    user: JSON.parse(localStorage.getItem("user")) || null,
+  message: null,
+  token: localStorage.getItem("token") || null,
+  user: (() => {
+    try {
+      const user = localStorage.getItem("user");
+      return user ? JSON.parse(user) : null;
+    } catch (error) {
+      console.error("Failed to parse user from localStorage:", error);
+      return null;
+    }
+  })(),
+  isSignUpSuccessful: false,
 };
 
-// ### FIX ###: I've added the missing logic and combined the cases into one reducer.
 export default function storeReducer(store, action = {}) {
-    switch (action.type) {
-        case 'LOGIN_SUCCESS':
-            localStorage.setItem("token", action.payload.token);
-            localStorage.setItem("user", JSON.stringify(action.payload.user));
-            return {
-                ...store,
-                token: action.payload.token,
-                user: action.payload.user,
-                message: "Login successful!",
-            };
+  switch (action.type) {
+    case "LOGIN_SUCCESS":
+      localStorage.setItem("token", action.payload.token);
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      return {
+        ...store,
+        token: action.payload.token,
+        user: action.payload.user,
+        message: "Login successful!",
+      };
 
-        case 'LOGOUT':
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            return {
-                ...store,
-                token: null,
-                user: null,
-                message: "You have been logged out.",
-            };
-        
-        case 'SET_HELLO_MESSAGE': // Example case for your Home component
-            return {
-                ...store,
-                message: action.payload
-            };
+    case "LOGOUT":
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      return {
+        ...store,
+        token: null,
+        user: null,
+        message: "You have been logged out.",
+      };
 
-// case 'isSignUpSuccesful'
-// {
-//   const {message, isSignUpSuccesful} = action.payload;
-//   return {
-//   ...store,
-//   message: message,
-//   isSignUpSuccessful: isSignUpSuccesful,
-//   }
-//}
-        case 'fetchedtoken': // This case was empty before
-            // If it's meant to do nothing, just return the existing store
-            return store;
+    case "SIGNUP_SUCCESS":
+      return {
+        ...store,
+        message: action.payload.message,
+        isSignUpSuccessful: action.payload.isSignUpSuccessful,
+      };
 
-        default:
-            // console.warn('Unknown action type:', action.type); // Optional: for debugging
-            return store;
-    }
+    case "CLEAR_MESSAGE":
+      return {
+        ...store,
+        message: null,
+      };
+
+    case "SET_ERROR":
+      return {
+        ...store,
+        message: action.payload,
+      };
+
+    case "SET_HELLO_MESSAGE":
+      return {
+        ...store,
+        message: action.payload,
+      };
+
+    case "FETCHED_TOKEN":
+      return {
+        ...store,
+        token: action.payload.token,
+        message: action.payload.message || "Token fetched successfully",
+      };
+
+    default:
+      // console.warn("Unknown action type:", action.type); // Uncomment for debugging
+      return store;
+  }
 }
-
-// isLoginSuccesful: false, 
-
-//export default function storeReducer(store, action = {}) {
-// case 'fetchedToken':
-// {
-//  const {message, token, isLoginSuccesful} = action,payload;
-
-//  return {
-//   ...store,
-//   message: message,
-//  token: token,
-//  isLoginSuccesful: isLoginSuccesful,
-//    }
-// }
-
-// case 'loggedOut':
-//{
-// const {message, token, isLoginSuccesful} = action.payload;
-// sessionStorage.removeItem('token');
-// return {
-// ...store,
-// message: message}
-// isSignUpSuccesful: true
