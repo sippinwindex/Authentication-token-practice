@@ -1,5 +1,5 @@
 // src/front/pages/fetchDemo.js - Demo version that works without backend
-import { mockDataService } from '../services/mockDataService.js';
+import { mockDataService } from '../mockDataService.js';
 
 // Check if we're in demo mode (no backend available)
 const DEMO_MODE = !import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_DEMO_MODE === 'true';
