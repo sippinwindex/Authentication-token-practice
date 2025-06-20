@@ -4,9 +4,11 @@ import { createRoot } from 'react-dom/client';
 import { StoreProvider } from './hooks/useGlobalReducer';
 import { InjectRoutes } from './routes';
 import { BackendURL } from './components/BackendURL';
-import './index.css';
+import "./pages/layout.css";
+
 
 const Main = () => {
+
   if (!import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_BACKEND_URL === '') {
     return <BackendURL />;
   }

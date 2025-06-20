@@ -1,52 +1,25 @@
-import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+// src/front/pages/Home.jsx
+import React from 'react';
+import { Link } from 'react-router-dom';
 
+// This is a NAMED EXPORT. The "export" keyword is right here.
 export const Home = () => {
-
-	const { store, dispatch } = useGlobalReducer()
-
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
-
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
-
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
-
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
-
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
-
-	return (
-		<div className="text-center mt-5">
-			<h1 className="display-4">Hello Rigo!!</h1>
-			<p className="lead">
-				<img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-			</p>
-			<div className="alert alert-info">
-				{store.message ? (
-					<span>{store.message}</span>
-				) : (
-					<span className="text-danger">
-						Loading message from the backend (make sure your python 🐍 backend is running)...
-					</span>
-				)}
-			</div>
-		</div>
-	);
-}; 
+    return (
+        // This uses the custom CSS class from layout.css for consistent styling.
+        <div className="glass-panel" style={{ maxWidth: '700px', textAlign: 'center' }}>
+            <h1>Welcome to InvoiceApp</h1>
+            <p style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
+                A modern, clean, and fast application to manage your invoices. 
+                Log in to view your dashboard or sign up to get started.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+                <Link to="/login" className="btn btn-primary">
+                    Login
+                </Link>
+                <Link to="/signup" className="btn btn-secondary">
+                    Sign Up
+                </Link>
+            </div>
+        </div>
+    );
+};

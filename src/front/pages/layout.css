@@ -1,0 +1,226 @@
+/* frontend/src/styles/layout.css - UPDATED LIGHT THEME */
+
+/* === Base Variables (Light Theme) === */
+:root {
+    --blur-amount: 12px;
+    --border-radius-main: 16px;
+    --border-radius-item: 10px;
+    --transition-speed: 0.3s;
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border-color: rgba(255, 255, 255, 0.6);
+    --glass-highlight-border: rgba(255, 255, 255, 0.9);
+    --text-color-body: #495057; /* Dark gray for body text */
+    --text-color-heading: #1a253c; /* Strong navy for headings */
+    --text-color-accent: #007bff; /* A nice blue for links/buttons */
+    --text-color-muted: #6c757d;
+    --shadow-light: 0 4px 15px rgba(31, 38, 135, 0.1);
+    --shadow-medium: 0 8px 30px rgba(31, 38, 135, 0.15);
+    --font-family-heading: 'Poppins', sans-serif; /* A more modern font */
+    --font-family-body: 'Poppins', sans-serif;
+}
+
+/* === Global Reset & Base === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    background-image: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
+    font-family: var(--font-family-body);
+    color: var(--text-color-body);
+    line-height: 1.6;
+}
+
+.app-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 70px; /* Space for the fixed navbar */
+}
+
+.app-wrapper > main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align content to the top */
+    padding: 2rem 1rem;
+}
+
+/* === Main Glass Panel (For Content) === */
+.glass-panel {
+    width: 100%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border-radius: var(--border-radius-main);
+    border: 1px solid var(--glass-border-color);
+    box-shadow: var(--shadow-medium);
+    padding: 2rem 2.5rem;
+}
+
+h1, h2 {
+    font-family: var(--font-family-heading);
+    color: var(--text-color-heading);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+h2 { font-size: 1.8rem; }
+
+p {
+    text-align: center;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+/* === Form Styles === */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--text-color-heading);
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #ced4da;
+    border-radius: var(--border-radius-item);
+    color: var(--text-color-body);
+    font-family: var(--font-family-body);
+    font-size: 1rem;
+    outline: none;
+    transition: all var(--transition-speed) ease;
+    padding: 0.8rem 1rem;
+}
+
+.form-input:focus {
+    background: #fff;
+    border-color: var(--text-color-accent);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+/* === Button Styles === */
+.btn {
+    border-radius: var(--border-radius-item);
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: var(--font-family-body);
+    font-size: 1rem;
+    transition: all var(--transition-speed) ease;
+    padding: 0.8rem 1.5rem;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background-color: var(--text-color-accent);
+    color: #fff;
+    box-shadow: var(--shadow-light);
+}
+.btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: var(--shadow-medium);
+}
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+/* === Navbar === */
+.main-nav {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0 2rem;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.main-nav .nav-logo {
+    font-family: var(--font-family-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color-heading);
+    text-decoration: none;
+}
+
+.main-nav .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.main-nav .nav-links a, .main-nav .nav-links button {
+    font-family: var(--font-family-body);
+    color: var(--text-color-body);
+    text-decoration: none;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.main-nav .nav-links a:hover, .main-nav .nav-links button:hover {
+    color: var(--text-color-accent);
+}
+
+/* === Footer === */
+.retro-footer {
+    background-color: transparent;
+    padding: 20px 15px;
+    text-align: center;
+    font-size: 1rem;
+    color: var(--text-color-muted);
+    width: 100%;
+    margin-top: 2rem; /* Give it space from the content */
+}
+
+.retro-footer .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.retro-heart {
+    color: #e53e3e;
+}
+
+.github-icon-link {
+    color: var(--text-color-muted);
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.github-icon-link:hover {
+    color: var(--text-color-accent);
+    transform: scale(1.1);
+}
+
+/* Remove retro-futuristic elements that don't fit the light theme */
+.retro-footer .footer-c64-line { display: none; }

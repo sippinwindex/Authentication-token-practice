@@ -1,8 +1,8 @@
 // src/front/pages/Login.jsx
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import useGlobalReducer from '../hooks/useGlobalReducer';
-import './login.css';
+import useGlobalReducer from '../hooks/useGlobalReducer.jsx';
+import { loginUser } from './fetch.js'; // <-- IMPORT from fetch.js
 
 export const Login = () => {
   const { store, dispatch } = useGlobalReducer();
@@ -12,135 +12,86 @@ export const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // This effect correctly redirects if the user is already logged in.
   useEffect(() => {
-    if (store.token && store.token !== '' && store.token !== null) {
+    if (store.token) {
       navigate('/private');
     }
   }, [store.token, navigate]);
-
-  const loginUser = async (email, password) => {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message ||
-          'Login failed. Please check your credentials or ensure the backend is running and accessible.'
-      );
-    }
-    return response.json();
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    if (!email || !password) {
-      setError('Please enter both email and password.');
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      // 1. Call the clean, centralized function from fetch.js
       const data = await loginUser(email, password);
+      
+      // 2. Dispatch the success action to the reducer
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: { token: data.access_token, user: data.user },
+        payload: { token: data.token, user: data.user },
       });
+      
+      // 3. Navigate to the private dashboard
       navigate('/private');
+
     } catch (err) {
+      // 4. On failure, set the local error state to display it
       setError(err.message);
-      dispatch({ type: 'SET_ERROR', payload: err.message });
+      // Optionally, you can also dispatch to a global error state if needed
+      // dispatch({ type: 'SET_ERROR', payload: err.message });
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (store.token && store.token !== '' && store.token !== null) {
-    return (
-      <div className="login-page-wrapper">
-        <div className="login-container text-center mt-5">
-          <div className="glassmorphism-card p-4">
-            <h2>Welcome Back!</h2>
-            <p>Hello {store.user?.email || 'User'}, you are logged in!</p>
-            <Link to="/private" className="btn btn-primary modern-button mt-3">
-              Go to Dashboard
-            </Link>
-            <button
-              onClick={() => {
-                dispatch({ type: 'LOGOUT' });
-                navigate('/login');
-              }}
-              className="btn btn-outline-secondary modern-button mt-3 ms-2"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="login-page-wrapper">
-      <div className="login-container text-center">
-        <div className="glassmorphism-card">
-          <h1 className="mb-4">Login</h1>
-          {error && <div className="alert alert-danger">{error}</div>}
-          {store.message && <p>{store.message}</p>}
-          <form onSubmit={handleLogin}>
-            <div className="form-floating mb-3">
-              <input
-                type="email"
-                className="form-control"
-                id="floatingInput"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-              <label htmlFor="floatingInput">Email address</label>
-            </div>
-            <div className="form-floating mb-3">
-              <input
-                type="password"
-                className="form-control"
-                id="floatingPassword"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-              <label htmlFor="floatingPassword">Password</label>
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary w-100 modern-button"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  Logging in...
-                </>
-              ) : (
-                'Login'
-              )}
-            </button>
-          </form>
-          <p className="mt-3">
-            Don't have an account? <Link to="/signup">Sign Up</Link>
-          </p>
+    // Use the custom CSS classes for styling
+    <div className="glass-panel" style={{ maxWidth: '500px' }}>
+      <h1>Login</h1>
+      
+      {/* Use the custom error message style */}
+      {error && <p className="error-message" style={{ textAlign: 'center' }}>{error}</p>}
+      
+      <form onSubmit={handleLogin} style={{ marginTop: '1.5rem' }}>
+        <div className="form-group">
+          <label htmlFor="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            className="form-input"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={isLoading}
+          />
         </div>
-      </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            className="form-input"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={isLoading}
+          />
+        </div>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          style={{ width: '100%', marginTop: '1rem' }}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+      <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+        Don't have an account? <Link to="/signup" style={{ color: 'var(--text-color-accent)' }}>Sign Up</Link>
+      </p>
     </div>
   );
 };

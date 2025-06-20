@@ -1,7 +1,8 @@
 // src/front/pages/fetch.js
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3001';
 
-// Helper for making authenticated requests
+// This helper function is perfect and needs no changes.
 const apiFetch = async (endpoint, options = {}) => {
     const response = await fetch(`${BACKEND_URL}${endpoint}`, {
         ...options,
@@ -11,36 +12,57 @@ const apiFetch = async (endpoint, options = {}) => {
         },
     });
 
+    if (response.status === 204) {
+        return { success: true };
+    }
+
     const data = await response.json();
     if (!response.ok) {
-        throw new Error(data.msg || `API error: ${response.status}`);
+        // Your backend now sends "message" for errors, so this is correct.
+        throw new Error(data.message || `API error: ${response.status}`);
     }
     return data;
 };
 
-export const loginUser = async (email, password) => {
-    return apiFetch('/api/token', {
+// This function is correct. It calls /api/login as required by the backend.
+export const loginUser = (email, password) => {
+    return apiFetch('/api/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
     });
 };
 
-// Get all invoices for the logged-in user
-export const getInvoices = async (token) => {
-    const data = await apiFetch('/api/invoices', {
+// This function is correct.
+export const registerUser = (email, password) => {
+    return apiFetch('/api/register', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+    });
+};
+
+// This function is correct. The backend now returns {"invoices": [...]}.
+export const getInvoices = (token) => {
+    return apiFetch('/api/invoices', {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
     });
-    // Wrap in object to match Private.jsx expectation
-    return { invoices: data };
 };
 
-// Create a new invoice
-export const createInvoice = async (token, invoiceData) => {
-    // Generate a unique invoice number if not provided
-    const invoiceNumber = invoiceData.invoice_number || 
-        `INV-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
-    
+// =================================================================
+//          THIS IS THE FULLY SYNCHRONIZED VERSION
+// =================================================================
+
+export const getInvoice = (token, invoiceId) => {
+    return apiFetch(`/api/invoices/${invoiceId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+};
+// =================================================================
+
+// This function is correct. It generates the invoice number on the frontend.
+export const createInvoice = (token, invoiceData) => {
+    const invoiceNumber = `INV-${Date.now()}`;
     return apiFetch('/api/invoices', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -52,8 +74,8 @@ export const createInvoice = async (token, invoiceData) => {
     });
 };
 
-// Update an existing invoice
-export const updateInvoice = async (token, invoiceId, invoiceData) => {
+// This function is correct.
+export const updateInvoice = (token, invoiceId, invoiceData) => {
     return apiFetch(`/api/invoices/${invoiceId}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -64,46 +86,10 @@ export const updateInvoice = async (token, invoiceId, invoiceData) => {
     });
 };
 
-// Delete an invoice
-export const deleteInvoice = async (token, invoiceId) => {
+// This function is correct.
+export const deleteInvoice = (token, invoiceId) => {
     return apiFetch(`/api/invoices/${invoiceId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
     });
-};
-
-// Get a single invoice by ID
-export const getInvoice = async (token, invoiceId) => {
-    try {
-        // Since your backend doesn't have a single invoice endpoint,
-        // we'll get all invoices and filter for the specific one
-        const { invoices } = await getInvoices(token);
-        const invoice = invoices.find(inv => inv.id === parseInt(invoiceId));
-        
-        if (!invoice) {
-            throw new Error('Invoice not found');
-        }
-        
-        return invoice;
-    } catch (error) {
-        console.error('Error fetching single invoice:', error);
-        throw error;
-    }
-};
-
-// Register a new user
-export const registerUser = async (email, password) => {
-    return apiFetch('/api/register', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-    });
-};
-
-// Sign out function (if needed)
-export const signOut = async () => {
-    // Clear any stored tokens or user data
-    sessionStorage.removeItem('token');
-    localStorage.removeItem('token');
-    // You can add additional cleanup here if needed
-    return { message: 'Logged out successfully' };
 };
