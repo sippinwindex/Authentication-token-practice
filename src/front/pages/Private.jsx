@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer.jsx';
-import { 
-    getInvoices, 
-    createInvoice, 
+import {
+    getInvoices,
+    createInvoice,
     updateInvoice,
     deleteInvoice,
     getStoredToken,
@@ -12,7 +12,7 @@ import {
     isAuthenticated,
     removeStoredToken
     // REMOVED: debugTokenStatus - this function doesn't exist
-} from './fetch.js';
+} from './fetchDemo.js';
 import './private.css';
 
 export const Private = () => {
@@ -45,7 +45,7 @@ export const Private = () => {
 
     useEffect(() => {
         const token = getToken();
-        
+
         // If no token exists anywhere, redirect to login
         if (!token) {
             navigate("/login");
@@ -61,10 +61,10 @@ export const Private = () => {
             } catch (error) {
                 console.error("Error fetching invoices:", error);
                 setError(error.message);
-                
+
                 // If authentication error, logout and redirect
-                if (error.message.includes("401") || 
-                    error.message.includes("422") || 
+                if (error.message.includes("401") ||
+                    error.message.includes("422") ||
                     error.message.includes("Unauthorized") ||
                     error.message.includes("Invalid token")) {
                     dispatch({ type: "LOGOUT" });
@@ -81,7 +81,7 @@ export const Private = () => {
     const handleCreate = async (e) => {
         e.preventDefault();
         setError("");
-        
+
         const token = getToken();
         if (!token) {
             navigate("/login");
@@ -94,9 +94,9 @@ export const Private = () => {
         }
 
         try {
-            const newInvoice = await createInvoice(token, { 
-                invoice_amount: newAmount, 
-                invoice_date: newDate 
+            const newInvoice = await createInvoice(token, {
+                invoice_amount: newAmount,
+                invoice_date: newDate
             });
             setInvoices([newInvoice, ...invoices]);
             setNewAmount("");
@@ -105,10 +105,10 @@ export const Private = () => {
         } catch (error) {
             console.error("Error creating invoice:", error);
             setError(error.message);
-            
+
             // Handle auth errors
-            if (error.message.includes("401") || 
-                error.message.includes("422") || 
+            if (error.message.includes("401") ||
+                error.message.includes("422") ||
                 error.message.includes("Unauthorized") ||
                 error.message.includes("Invalid token")) {
                 dispatch({ type: "LOGOUT" });
@@ -132,10 +132,10 @@ export const Private = () => {
             } catch (error) {
                 console.error("Error deleting invoice:", error);
                 setError(error.message);
-                
+
                 // Handle auth errors
-                if (error.message.includes("401") || 
-                    error.message.includes("422") || 
+                if (error.message.includes("401") ||
+                    error.message.includes("422") ||
                     error.message.includes("Unauthorized") ||
                     error.message.includes("Invalid token")) {
                     dispatch({ type: "LOGOUT" });
@@ -154,7 +154,7 @@ export const Private = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         setError("");
-        
+
         const token = getToken();
         if (!token) {
             navigate("/login");
@@ -167,9 +167,9 @@ export const Private = () => {
         }
 
         try {
-            const updatedInvoice = await updateInvoice(token, isEditing.id, { 
-                invoice_amount: editAmount, 
-                invoice_date: editDate 
+            const updatedInvoice = await updateInvoice(token, isEditing.id, {
+                invoice_amount: editAmount,
+                invoice_date: editDate
             });
             setInvoices(invoices.map(inv => inv.id === isEditing.id ? updatedInvoice : inv));
             setIsEditing(null);
@@ -177,10 +177,10 @@ export const Private = () => {
         } catch (error) {
             console.error("Error updating invoice:", error);
             setError(error.message);
-            
+
             // Handle auth errors
-            if (error.message.includes("401") || 
-                error.message.includes("422") || 
+            if (error.message.includes("401") ||
+                error.message.includes("422") ||
                 error.message.includes("Unauthorized") ||
                 error.message.includes("Invalid token")) {
                 dispatch({ type: "LOGOUT" });
@@ -192,58 +192,58 @@ export const Private = () => {
     return (
         <div className="dashboard-container">
             <h1>Invoice Dashboard</h1>
-            
+
             {/* Debug info - only show in development */}
             {import.meta.env.DEV && (
-                <div style={{ 
-                    padding: '10px', 
-                    background: '#f0f0f0', 
-                    margin: '10px 0', 
+                <div style={{
+                    padding: '10px',
+                    background: '#f0f0f0',
+                    margin: '10px 0',
                     fontSize: '12px',
                     borderRadius: '4px'
                 }}>
                     Debug: Token exists: {!!getToken()}, Store token: {!!store.token}, LocalStorage token: {!!getStoredToken()}
                 </div>
             )}
-            
+
             <div className="glass-panel">
                 <h2>Create New Invoice</h2>
                 <form onSubmit={handleCreate}>
                     <div className="form-grid">
-                        <div className="form-group" style={{flexGrow: 1}}>
+                        <div className="form-group" style={{ flexGrow: 1 }}>
                             <label htmlFor="newAmount">Invoice Amount ($)</label>
-                            <input 
-                                type="number" 
-                                step="0.01" 
+                            <input
+                                type="number"
+                                step="0.01"
                                 min="0.01"
-                                className="form-input" 
-                                id="newAmount" 
-                                value={newAmount} 
-                                onChange={e => setNewAmount(e.target.value)} 
-                                required 
+                                className="form-input"
+                                id="newAmount"
+                                value={newAmount}
+                                onChange={e => setNewAmount(e.target.value)}
+                                required
                                 placeholder="0.00"
                             />
                         </div>
-                        <div className="form-group" style={{flexGrow: 1}}>
+                        <div className="form-group" style={{ flexGrow: 1 }}>
                             <label htmlFor="newDate">Invoice Date</label>
-                            <input 
-                                type="date" 
-                                className="form-input" 
-                                id="newDate" 
-                                value={newDate} 
-                                onChange={e => setNewDate(e.target.value)} 
-                                required 
+                            <input
+                                type="date"
+                                className="form-input"
+                                id="newDate"
+                                value={newDate}
+                                onChange={e => setNewDate(e.target.value)}
+                                required
                             />
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-primary" style={{width: '100%'}}>
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
                         Add Invoice
                     </button>
                 </form>
             </div>
-            
+
             {error && <div className="error-message">{error}</div>}
-            
+
             <div className="glass-panel">
                 <h2>Your Invoices ({invoices.length})</h2>
                 {isLoading ? (
@@ -258,13 +258,13 @@ export const Private = () => {
                                 <div className="invoice-details">
                                     <h3>{invoice.invoice_number}</h3>
                                     <p>
-                                        Amount: <strong>${parseFloat(invoice.invoice_amount).toFixed(2)}</strong> | 
+                                        Amount: <strong>${parseFloat(invoice.invoice_amount).toFixed(2)}</strong> |
                                         Date: {new Date(invoice.invoice_date).toLocaleDateString()}
                                     </p>
                                 </div>
                                 <div className="invoice-actions">
-                                    <Link 
-                                        to={`/invoice/${invoice.id}`} 
+                                    <Link
+                                        to={`/invoice/${invoice.id}`}
                                         className="btn btn-secondary"
                                         style={{
                                             textDecoration: 'none',
@@ -275,7 +275,7 @@ export const Private = () => {
                                     >
                                         View
                                     </Link>
-                                    <button 
+                                    <button
                                         onClick={() => handleEditClick(invoice)}
                                         className="btn btn-secondary"
                                         style={{
@@ -285,7 +285,7 @@ export const Private = () => {
                                     >
                                         Edit
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => handleDelete(invoice.id)}
                                         className="btn btn-secondary"
                                         style={{
@@ -308,7 +308,7 @@ export const Private = () => {
                     </div>
                 )}
             </div>
-            
+
             {/* Edit Modal */}
             {isEditing && (
                 <div className="edit-modal-overlay">
@@ -318,32 +318,32 @@ export const Private = () => {
                             <form onSubmit={handleUpdate}>
                                 <div className="form-group">
                                     <label htmlFor="editAmount">Invoice Amount ($)</label>
-                                    <input 
-                                        type="number" 
-                                        step="0.01" 
+                                    <input
+                                        type="number"
+                                        step="0.01"
                                         min="0.01"
-                                        className="form-input" 
-                                        id="editAmount" 
-                                        value={editAmount} 
-                                        onChange={e => setEditAmount(e.target.value)} 
-                                        required 
+                                        className="form-input"
+                                        id="editAmount"
+                                        value={editAmount}
+                                        onChange={e => setEditAmount(e.target.value)}
+                                        required
                                     />
                                 </div>
-                                <div className="form-group" style={{marginTop: '1rem'}}>
+                                <div className="form-group" style={{ marginTop: '1rem' }}>
                                     <label htmlFor="editDate">Invoice Date</label>
-                                    <input 
-                                        type="date" 
-                                        className="form-input" 
-                                        id="editDate" 
-                                        value={editDate} 
-                                        onChange={e => setEditDate(e.target.value)} 
-                                        required 
+                                    <input
+                                        type="date"
+                                        className="form-input"
+                                        id="editDate"
+                                        value={editDate}
+                                        onChange={e => setEditDate(e.target.value)}
+                                        required
                                     />
                                 </div>
                                 <div className="modal-actions">
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setIsEditing(null)} 
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditing(null)}
                                         className="btn btn-secondary"
                                     >
                                         Cancel

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer.jsx';
-import { loginUser, setStoredToken, isAuthenticated, testAuth, debugTokenStatus } from './fetch.js';
+import { loginUser, setStoredToken, isAuthenticated, testAuth, debugTokenStatus } from './fetchDemo.js';
 
 export const Login = () => {
   const { store, dispatch } = useGlobalReducer();
@@ -29,26 +29,26 @@ export const Login = () => {
     try {
       console.log('🔐 Starting login process...');
       setDebugInfo('Calling loginUser API...');
-      
+
       // Step 1: Call login API
       const data = await loginUser(email, password);
       console.log('📡 Login API response:', data);
       setDebugInfo(`Login API successful. Response: ${JSON.stringify(data, null, 2)}`);
-      
+
       // Step 2: Extract token
       const token = data.token || data.access_token;
       console.log('🔑 Extracted token:', token ? `${token.substring(0, 30)}...` : 'NONE');
       setDebugInfo(prev => prev + `\nToken extracted: ${token ? 'YES' : 'NO'}`);
-      
+
       if (!token) {
         throw new Error('No authentication token received from server');
       }
-      
+
       // Step 3: Store token
       setStoredToken(token);
       console.log('💾 Token stored in localStorage');
       setDebugInfo(prev => prev + '\nToken stored in localStorage');
-      
+
       // Step 4: Test the token immediately
       setDebugInfo(prev => prev + '\nTesting token...');
       try {
@@ -60,18 +60,18 @@ export const Login = () => {
         setDebugInfo(prev => prev + `\nToken test: FAILED - ${testError.message}`);
         throw new Error(`Token validation failed: ${testError.message}`);
       }
-      
+
       // Step 5: Update global state
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: { 
-          token: token, 
+        payload: {
+          token: token,
           user: data.user || { email }
         },
       });
       console.log('🔄 Global state updated');
       setDebugInfo(prev => prev + '\nGlobal state updated');
-      
+
       // Step 6: Navigate
       setDebugInfo(prev => prev + '\nNavigating to private page...');
       navigate('/private');
@@ -80,7 +80,7 @@ export const Login = () => {
       console.error('❌ Login failed:', err);
       setError(`Login failed: ${err.message}`);
       setDebugInfo(prev => prev + `\nERROR: ${err.message}`);
-      
+
       // Clear any stored data on login failure
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -98,19 +98,19 @@ export const Login = () => {
   return (
     <div className="glass-panel" style={{ maxWidth: '600px' }}>
       <h1>Login</h1>
-      
+
       {/* Debug Panel - only show in development */}
       {import.meta.env.DEV && (
-        <div style={{ 
-          background: '#f8f9fa', 
-          padding: '1rem', 
-          marginBottom: '1rem', 
+        <div style={{
+          background: '#f8f9fa',
+          padding: '1rem',
+          marginBottom: '1rem',
           borderRadius: '8px',
           fontSize: '12px',
           border: '1px solid #dee2e6'
         }}>
           <strong>Debug Info:</strong>
-          <button 
+          <button
             onClick={runDebugCheck}
             style={{
               marginLeft: '10px',
@@ -124,9 +124,9 @@ export const Login = () => {
           >
             Check Status
           </button>
-          <pre style={{ 
-            marginTop: '10px', 
-            whiteSpace: 'pre-wrap', 
+          <pre style={{
+            marginTop: '10px',
+            whiteSpace: 'pre-wrap',
             fontSize: '11px',
             background: 'white',
             padding: '10px',
@@ -136,13 +136,13 @@ export const Login = () => {
           </pre>
         </div>
       )}
-      
+
       {error && (
         <div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}>
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleLogin} style={{ marginTop: '1.5rem' }}>
         <div className="form-group">
           <label htmlFor="email">Email Address</label>
@@ -179,7 +179,7 @@ export const Login = () => {
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      
+
       <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>
         Don't have an account?{' '}
         <Link to="/signup" style={{ color: 'var(--text-color-accent)' }}>

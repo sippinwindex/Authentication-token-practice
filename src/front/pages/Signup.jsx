@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer.jsx';
-import { registerUser } from './fetch.js'; // <-- IMPORT from fetch.js
+import { registerUser } from './fetchDemo.js'; // <-- IMPORT from fetch.js
 
 export const Signup = () => {
   const { dispatch } = useGlobalReducer();
@@ -40,9 +40,9 @@ export const Signup = () => {
   return (
     <div className="glass-panel" style={{ maxWidth: '500px' }}>
       <h1>Create Account</h1>
-      
+
       {error && <p className="error-message" style={{ textAlign: 'center' }}>{error}</p>}
-      
+
       <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
         <div className="form-group">
           <label htmlFor="email">Email Address</label>
