@@ -2,12 +2,18 @@
 import { mockDataService } from '../mockDataService.js';
 
 // Check if we're in demo mode (no backend available)
-const DEMO_MODE = !import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_DEMO_MODE === 'true';
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true' || 
+                  !import.meta.env.VITE_BACKEND_URL || 
+                  import.meta.env.VITE_BACKEND_URL === '';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:3001';
 
 console.log(`🔧 Mode: ${DEMO_MODE ? 'DEMO (No Backend)' : 'LIVE Backend'}`);
 console.log(`🔧 Backend URL: ${BACKEND_URL}`);
+console.log('🔧 Environment variables:', {
+  VITE_DEMO_MODE: import.meta.env.VITE_DEMO_MODE,
+  VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL
+});
 
 // Enhanced API fetch helper
 const apiFetch = async (endpoint, options = {}) => {
