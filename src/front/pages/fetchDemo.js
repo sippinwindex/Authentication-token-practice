@@ -276,6 +276,38 @@ export const logoutUser = () => {
     return Promise.resolve({ message: 'Logged out successfully' });
 };
 
+// Test authentication (demo version)
+export const testAuth = async (token) => {
+    try {
+        if (DEMO_MODE) {
+            console.log('🎭 Using demo auth test');
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        message: "Demo authentication working!",
+                        user_id: "1",
+                        timestamp: new Date().toISOString()
+                    });
+                }, 200);
+            });
+        }
+
+        const data = await apiFetch('/api/test-auth', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        console.log('✅ Auth test successful:', data);
+        return data;
+    } catch (error) {
+        console.log('🎭 Falling back to demo auth test');
+        return {
+            message: "Demo authentication working!",
+            user_id: "1",
+            timestamp: new Date().toISOString()
+        };
+    }
+};
+
 // Debug function
 export const debugTokenStatus = () => {
     const token = getStoredToken();

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer.jsx';
-import { loginUser, setStoredToken, isAuthenticated, testAuth, debugTokenStatus } from './fetchDemo.js';
+import { loginUser, setStoredToken, isAuthenticated, debugTokenStatus } from './fetchDemo.js';
 
 export const Login = () => {
   const { store, dispatch } = useGlobalReducer();
